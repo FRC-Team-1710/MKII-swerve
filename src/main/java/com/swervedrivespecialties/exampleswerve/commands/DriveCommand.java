@@ -25,7 +25,7 @@ public class DriveCommand extends Command {
         strafe = Math.copySign(Math.pow(strafe, 2.0), strafe);
 
         double rotation = -Robot.getOi().getPrimaryJoystick().getRawAxis(4);
-        rotation = Utilities.deadband(rotation, 0.1);
+        rotation = Utilities.deadband(rotation, 0.15);
         // Square the rotation stick
         rotation = Math.copySign(Math.pow(rotation, 2.0), rotation);
 

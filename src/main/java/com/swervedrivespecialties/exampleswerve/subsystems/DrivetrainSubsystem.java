@@ -24,10 +24,10 @@ public class DrivetrainSubsystem extends Subsystem {
     private static final double TRACKWIDTH = 23;
     private static final double WHEELBASE = 23;
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(290.0);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(113.7);
-    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(333.8);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(100.0 );
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(0.0);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(0.0);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(0.0);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(0.0);
 
     private static DrivetrainSubsystem instance;
 
@@ -113,6 +113,10 @@ public class DrivetrainSubsystem extends Subsystem {
 
     public void drive(Translation2d translation, double rotation, boolean fieldOriented) {
         rotation *= 2.0 / Math.hypot(WHEELBASE, TRACKWIDTH);
+        SmartDashboard.putNumber("Left Joystick x", translation.getX());
+        SmartDashboard.putNumber("Left Joystick y", translation.getY());
+        SmartDashboard.putNumber("Rotation", rotation);
+
         ChassisSpeeds speeds;
         if (fieldOriented) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation,
