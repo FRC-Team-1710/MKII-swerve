@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'edu.wpi.first.GradleRIO' version '2020.1.2'
+    id 'edu.wpi.first.GradleRIO' version '2021.2.2'
 }
 
 def ROBOT_MAIN_CLASS = "com.swervedrivespecialties.exampleswerve.Main"
@@ -52,7 +52,7 @@ repositories {
 deploy {
     targets {
         roboRIO('roborio') {
-            team = frc.getTeamOrDefault(2910)
+            team = frc.getTeamOrDefault(1710)
         }
     }
     artifacts {
@@ -75,7 +75,7 @@ dependencies {
 
     // In Java for now, the argument must be false
     simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
-
+    simulation wpi.deps.sim.driverstation(wpi.platforms.desktop, false)
     implementation "com.github.FRCTeam2910.Common:robot:6456e9c82e"
 }
 

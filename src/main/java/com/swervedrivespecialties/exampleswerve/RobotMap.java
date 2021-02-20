@@ -1,5 +1,6 @@
 package com.swervedrivespecialties.exampleswerve;
 
+/** Port map for drive motors, angle motors, and encoders */
 public class RobotMap {
     public static final int DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR = 2; // CAN
     public static final int DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER = 1; // Analog

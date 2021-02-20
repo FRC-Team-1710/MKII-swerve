@@ -8,10 +8,15 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
+/**
+ * Entry point for program. Init methods and periodic methods are located here.
+ * Schedules commands
+ */
 public class Robot extends TimedRobot {
         private static OI oi;
         private Command autonomousCommand;
         private static DrivetrainSubsystem drivetrain;
+        // Initialization of CAN Sparks for limit setting
         private CANSparkMax backLeftAngle = new CANSparkMax(RobotMap.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
                         CANSparkMaxLowLevel.MotorType.kBrushless);
         private CANSparkMax backRightAngle = new CANSparkMax(RobotMap.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,

@@ -5,19 +5,20 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
+/** Class for outputs and inputs */
 public class OI {
     /*
-       Add your joysticks and buttons here
+     * Add your joysticks and buttons here
      */
     private Joystick primaryJoystick = new Joystick(0);
 
     public OI() {
         // Back button zeroes the drivetrain
-        new JoystickButton(primaryJoystick, 7).whenPressed(
-                new InstantCommand(() -> DrivetrainSubsystem.getInstance().resetGyroscope())
-        );
+        new JoystickButton(primaryJoystick, 7)
+                .whenPressed(new InstantCommand(() -> DrivetrainSubsystem.getInstance().resetGyroscope()));
     }
 
+    /** @return The joystick port */
     public Joystick getPrimaryJoystick() {
         return primaryJoystick;
     }
