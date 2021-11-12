@@ -78,11 +78,13 @@ public class DrivetrainSubsystem extends Subsystem {
     );
     
     private final Gyroscope gyroscope = new NavX(SPI.Port.kMXP);
+    private final SwerveDriveOdometry odometry;
+    private Pose2d pose;
 
     public DrivetrainSubsystem() {
         gyroscope.calibrate();
         gyroscope.setInverted(true); // You might not need to invert the gyro
-
+        odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(gyroscope.getAngle().toRadians()));
         frontLeftModule.setName("Front Left");
         frontRightModule.setName("Front Right");
         backLeftModule.setName("Back Left");
@@ -96,9 +98,6 @@ public class DrivetrainSubsystem extends Subsystem {
 
         return instance;
     }
-
-    private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(gyroscope.getAngle().toRadians()));
-    private Pose2d pose;
 
     @Override
     public void periodic() {
@@ -146,10 +145,10 @@ public class DrivetrainSubsystem extends Subsystem {
         } else {
             speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
         }
-
+        
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         pose = odometry.update(new Rotation2d(gyroscope.getAngle().toRadians()), states);
-
+        
         frontLeftModule.setTargetVelocity(states[0].speedMetersPerSecond, states[0].angle.getRadians());
         frontRightModule.setTargetVelocity(states[1].speedMetersPerSecond, states[1].angle.getRadians());
         backLeftModule.setTargetVelocity(states[2].speedMetersPerSecond, states[2].angle.getRadians());
