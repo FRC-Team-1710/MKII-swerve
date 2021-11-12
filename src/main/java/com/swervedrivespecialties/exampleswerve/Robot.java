@@ -3,7 +3,6 @@ package com.swervedrivespecialties.exampleswerve;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.swervedrivespecialties.exampleswerve.commands.autonomousDrive;
-import com.swervedrivespecialties.exampleswerve.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -15,7 +14,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 public class Robot extends TimedRobot {
         private static OI oi;
         private Command autonomousCommand;
-        private static DrivetrainSubsystem drivetrain;
+
         // Initialization of CAN Sparks for limit setting
         private CANSparkMax backLeftAngle = new CANSparkMax(RobotMap.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
                         CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -41,7 +40,6 @@ public class Robot extends TimedRobot {
         @Override
         public void robotInit() {
                 oi = new OI();
-                drivetrain = DrivetrainSubsystem.getInstance();
                 backLeftAngle.setSmartCurrentLimit(25);
                 backRightAngle.setSmartCurrentLimit(25);
                 backLeftDrive.setSmartCurrentLimit(25);

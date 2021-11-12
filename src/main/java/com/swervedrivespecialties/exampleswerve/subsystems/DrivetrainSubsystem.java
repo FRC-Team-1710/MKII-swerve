@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.frcteam2910.common.drivers.Gyroscope;
@@ -74,7 +76,7 @@ public class DrivetrainSubsystem extends Subsystem {
             new Translation2d(-TRACKWIDTH / 2.0, WHEELBASE / 2.0),
             new Translation2d(-TRACKWIDTH / 2.0, -WHEELBASE / 2.0)
     );
-
+    
     private final Gyroscope gyroscope = new NavX(SPI.Port.kMXP);
 
     public DrivetrainSubsystem() {
@@ -94,6 +96,9 @@ public class DrivetrainSubsystem extends Subsystem {
 
         return instance;
     }
+
+    private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, new Rotation2d(gyroscope.getAngle().toRadians()));
+    private Pose2d pose;
 
     @Override
     public void periodic() {
@@ -133,7 +138,7 @@ public class DrivetrainSubsystem extends Subsystem {
         SmartDashboard.putNumber("Left Joystick x", translation.getX());
         SmartDashboard.putNumber("Left Joystick y", translation.getY());
         SmartDashboard.putNumber("Rotation", rotation);
-
+        
         ChassisSpeeds speeds;
         if (fieldOriented) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation,
@@ -143,6 +148,8 @@ public class DrivetrainSubsystem extends Subsystem {
         }
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+        pose = odometry.update(new Rotation2d(gyroscope.getAngle().toRadians()), states);
+
         frontLeftModule.setTargetVelocity(states[0].speedMetersPerSecond, states[0].angle.getRadians());
         frontRightModule.setTargetVelocity(states[1].speedMetersPerSecond, states[1].angle.getRadians());
         backLeftModule.setTargetVelocity(states[2].speedMetersPerSecond, states[2].angle.getRadians());
@@ -151,6 +158,7 @@ public class DrivetrainSubsystem extends Subsystem {
 
     public void resetGyroscope() {
         gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle());
+        odometry.resetPosition(pose, new Rotation2d(gyroscope.getAngle().toRadians()));
     }
 
     @Override
