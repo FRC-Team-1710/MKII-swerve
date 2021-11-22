@@ -27,10 +27,10 @@ public class DrivetrainSubsystem extends Subsystem {
     private static final double TRACKWIDTH = 23;
     private static final double WHEELBASE = 23;
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(0.0);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(0.0);
-    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(0.0);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(0.0);
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(122);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(200);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(8);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(2);
 
     private static DrivetrainSubsystem instance;
         /** Front left swerve module object */
@@ -153,12 +153,21 @@ public class DrivetrainSubsystem extends Subsystem {
         frontRightModule.setTargetVelocity(states[1].speedMetersPerSecond, states[1].angle.getRadians());
         backLeftModule.setTargetVelocity(states[2].speedMetersPerSecond, states[2].angle.getRadians());
         backRightModule.setTargetVelocity(states[3].speedMetersPerSecond, states[3].angle.getRadians());
+        
+        SmartDashboard.putString("Pose Get String", pose.toString());
+        SmartDashboard.putNumber("Pose Get X", pose.getX());
+        SmartDashboard.putNumber("Pose Get Y", pose.getY());
+        SmartDashboard.putNumber("Pose Rotation", pose.getRotation().getDegrees());
     }
 
     public void resetGyroscope() {
         gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle());
         odometry.resetPosition(pose, new Rotation2d(gyroscope.getAngle().toRadians()));
     }
+
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
+      }
 
     @Override
     protected void initDefaultCommand() {
