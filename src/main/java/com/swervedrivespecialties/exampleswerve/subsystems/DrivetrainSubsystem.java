@@ -27,10 +27,10 @@ public class DrivetrainSubsystem extends Subsystem {
     private static final double TRACKWIDTH = 23;
     private static final double WHEELBASE = 23;
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(122);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(200);
-    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(8);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(2);
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(196);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(203);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(10.5);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(22);
 
     private static DrivetrainSubsystem instance;
         /** Front left swerve module object */
@@ -134,6 +134,7 @@ public class DrivetrainSubsystem extends Subsystem {
      */
     public void drive(Translation2d translation, double rotation, boolean fieldOriented) {
         rotation *= 2.0 / Math.hypot(WHEELBASE, TRACKWIDTH);
+        rotation *= .5;
         SmartDashboard.putNumber("Left Joystick x", translation.getX());
         SmartDashboard.putNumber("Left Joystick y", translation.getY());
         SmartDashboard.putNumber("Rotation", rotation);
@@ -162,6 +163,7 @@ public class DrivetrainSubsystem extends Subsystem {
 
     public void resetGyroscope() {
         gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle());
+        pose = new Pose2d(new Translation2d(0,0), new Rotation2d(0));
         odometry.resetPosition(pose, new Rotation2d(gyroscope.getAngle().toRadians()));
     }
 

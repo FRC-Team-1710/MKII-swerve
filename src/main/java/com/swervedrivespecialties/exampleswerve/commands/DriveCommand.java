@@ -12,6 +12,9 @@ import org.frcteam2910.common.robot.Utilities;
  */
 public class DriveCommand extends Command {
 
+    private double prevForward;
+    private double prevStrafe;
+
     public DriveCommand() {
         requires(DrivetrainSubsystem.getInstance());
     }
@@ -35,6 +38,17 @@ public class DriveCommand extends Command {
         rotation = Utilities.deadband(rotation, 0.15);
         // Square the rotation stick but keep the sign
         rotation = Math.copySign(Math.pow(rotation, 2.0), rotation);
+        
+        if (Math.abs(forward-prevForward) <= 0.015 && forward != 0){
+            forward = prevForward;
+        } else if (Math.abs(forward-prevForward) > 0.015){
+            prevForward = forward;
+        }
+        if (Math.abs(strafe-prevStrafe) <= 0.02 && strafe != 0){
+            strafe = prevStrafe;
+        } else if (Math.abs(strafe-prevStrafe) > 0.02){
+            prevStrafe = strafe;
+        }
 
         // Send values to drive method in DrivetrainSubsystem
         DrivetrainSubsystem.getInstance().drive(new Translation2d(forward, strafe), rotation, true);
