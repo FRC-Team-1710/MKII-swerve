@@ -39,9 +39,9 @@ public class DriveCommand extends Command {
         // Square the rotation stick but keep the sign
         rotation = Math.copySign(Math.pow(rotation, 2.0), rotation);
         
-        if (Math.abs(forward-prevForward) <= 0.015 && forward != 0){
+        if (Math.abs(forward-prevForward) <= 0.02 && forward != 0){
             forward = prevForward;
-        } else if (Math.abs(forward-prevForward) > 0.015){
+        } else if (Math.abs(forward-prevForward) > 0.02){
             prevForward = forward;
         }
         if (Math.abs(strafe-prevStrafe) <= 0.02 && strafe != 0){

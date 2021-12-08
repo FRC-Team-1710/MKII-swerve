@@ -27,10 +27,10 @@ public class DrivetrainSubsystem extends Subsystem {
     private static final double TRACKWIDTH = 23;
     private static final double WHEELBASE = 23;
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(196);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(203);
-    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(10.5);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(22);
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(127);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(246);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(240);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(22.5);
 
     private static DrivetrainSubsystem instance;
         /** Front left swerve module object */
@@ -70,7 +70,7 @@ public class DrivetrainSubsystem extends Subsystem {
                     Mk2SwerveModuleBuilder.MotorType.NEO)
             .build();
         /** Ratios for swerve calculations */
-    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+    public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
             new Translation2d(TRACKWIDTH / 2.0, WHEELBASE / 2.0),
             new Translation2d(TRACKWIDTH / 2.0, -WHEELBASE / 2.0),
             new Translation2d(-TRACKWIDTH / 2.0, WHEELBASE / 2.0),
@@ -160,6 +160,14 @@ public class DrivetrainSubsystem extends Subsystem {
         SmartDashboard.putNumber("Pose Get Y", pose.getY());
         SmartDashboard.putNumber("Pose Rotation", pose.getRotation().getDegrees());
     }
+
+    public void setModuleStates(SwerveModuleState[] desiredStates) {
+        SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, 0.5);
+        frontLeftModule.setTargetVelocity(desiredStates[0].speedMetersPerSecond, desiredStates[0].angle.getRadians());
+        frontRightModule.setTargetVelocity(desiredStates[1].speedMetersPerSecond, desiredStates[1].angle.getRadians());
+        backLeftModule.setTargetVelocity(desiredStates[2].speedMetersPerSecond, desiredStates[2].angle.getRadians());
+        backRightModule.setTargetVelocity(desiredStates[3].speedMetersPerSecond, desiredStates[3].angle.getRadians());
+      }
 
     public void resetGyroscope() {
         gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle());
