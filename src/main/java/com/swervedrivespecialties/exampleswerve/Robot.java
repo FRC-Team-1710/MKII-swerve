@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
@@ -32,7 +31,6 @@ public class Robot extends TimedRobot {
         private static OI oi;
         private static DrivetrainSubsystem drivetrain;
         private final Timer timer = new Timer();
-        private SwerveDriveKinematics kinematics;
         private HolonomicDriveController controller;
         private Trajectory trajectory;
         /*
@@ -58,10 +56,7 @@ public class Robot extends TimedRobot {
         private CANSparkMax frontRightDrive = new CANSparkMax(RobotMap.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
                         CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        TrajectoryConfig config = new TrajectoryConfig(0.5, 0.25).setKinematics(drivetrain.kinematics);
-
-        ProfiledPIDController thetaController = new ProfiledPIDController(1.0, 0, 0,
-                        new TrapezoidProfile.Constraints(3, 1));
+        TrajectoryConfig config;
 
         public static OI getOi() {
                 return oi;
@@ -79,14 +74,15 @@ public class Robot extends TimedRobot {
                 frontLeftDrive.setSmartCurrentLimit(25);
                 frontRightAngle.setSmartCurrentLimit(25);
                 frontRightDrive.setSmartCurrentLimit(25);
-
                 drivetrain.resetGyroscope();
-
+                ProfiledPIDController thetaController = new ProfiledPIDController(0, 0, 0,
+                                new TrapezoidProfile.Constraints(5, 3.14));
+                config = new TrajectoryConfig(3, 4).setKinematics(drivetrain.kinematics);
                 trajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-                                List.of(new Translation2d(0.5, 0), new Translation2d(1, 0)),
-                                new Pose2d(1, 0.45, Rotation2d.fromDegrees(0)), config);
+                                List.of(new Translation2d(0.5, 0), new Translation2d(0.5, -0.4)),
+                                new Pose2d(0.55, -0.5, Rotation2d.fromDegrees(0)), config);
                 thetaController.enableContinuousInput(-Math.PI, Math.PI);
-                controller = new HolonomicDriveController(new PIDController(1, 0, 0), new PIDController(1, 0, 0),
+                controller = new HolonomicDriveController(new PIDController(0.5, 0, 0), new PIDController(0.5, 0, 0),
                                 thetaController);
         }
 
@@ -122,11 +118,14 @@ public class Robot extends TimedRobot {
                  * refChassisSpeeds.vyMetersPerSecond), refChassisSpeeds.omegaRadiansPerSecond,
                  * false); } else { drivetrain.drive(new Translation2d(0, 0), 0.0, false); }
                  */
-                State desiredState = trajectory.sample(timer.get());
+                if (timer.get() <= trajectory.getTotalTimeSeconds()) {
+                        State desiredState = trajectory.sample(timer.get());
 
-                ChassisSpeeds targetChassisSpeeds = controller.calculate(drivetrain.getPose(), desiredState,
-                                desiredState.poseMeters.getRotation());
-                SwerveModuleState[] targetModuleStates = kinematics.toSwerveModuleStates(targetChassisSpeeds);
-                drivetrain.setModuleStates(targetModuleStates);
+                        ChassisSpeeds targetChassisSpeeds = controller.calculate(drivetrain.getPose(), desiredState,
+                                        desiredState.poseMeters.getRotation());
+                        SwerveModuleState[] targetModuleStates = drivetrain.kinematics
+                                        .toSwerveModuleStates(targetChassisSpeeds);
+                        drivetrain.setModuleStates(targetModuleStates);
+                }
         }
 }

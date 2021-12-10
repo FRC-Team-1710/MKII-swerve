@@ -27,10 +27,10 @@ public class DrivetrainSubsystem extends Subsystem {
     private static final double TRACKWIDTH = 23;
     private static final double WHEELBASE = 23;
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(127);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(246);
-    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(240);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(22.5);
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(128);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(247);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(236);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(24);
 
     private static DrivetrainSubsystem instance;
         /** Front left swerve module object */
@@ -163,10 +163,14 @@ public class DrivetrainSubsystem extends Subsystem {
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, 0.5);
+        pose = odometry.update(new Rotation2d(gyroscope.getAngle().toRadians()), desiredStates);
         frontLeftModule.setTargetVelocity(desiredStates[0].speedMetersPerSecond, desiredStates[0].angle.getRadians());
         frontRightModule.setTargetVelocity(desiredStates[1].speedMetersPerSecond, desiredStates[1].angle.getRadians());
         backLeftModule.setTargetVelocity(desiredStates[2].speedMetersPerSecond, desiredStates[2].angle.getRadians());
         backRightModule.setTargetVelocity(desiredStates[3].speedMetersPerSecond, desiredStates[3].angle.getRadians());
+        SmartDashboard.putNumber("Pose Get X", pose.getX());
+        SmartDashboard.putNumber("Pose Get Y", pose.getY());
+        SmartDashboard.putNumber("Pose Rotation", pose.getRotation().getDegrees());
       }
 
     public void resetGyroscope() {
