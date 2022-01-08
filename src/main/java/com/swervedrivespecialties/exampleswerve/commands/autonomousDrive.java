@@ -11,7 +11,7 @@ import com.swervedrivespecialties.exampleswerve.subsystems.DrivetrainSubsystem;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * Command class for sending values in autonomous to

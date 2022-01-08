@@ -1,7 +1,5 @@
 package com.swervedrivespecialties.exampleswerve;
 
-import java.util.List;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.swervedrivespecialties.exampleswerve.subsystems.DrivetrainSubsystem;
@@ -9,19 +7,15 @@ import com.swervedrivespecialties.exampleswerve.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.controller.HolonomicDriveController;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+
+import com.pathplanner.lib.*;
 
 /**
  * Entry point for program. Init methods and periodic methods are located here.
@@ -32,7 +26,7 @@ public class Robot extends TimedRobot {
         private static DrivetrainSubsystem drivetrain;
         private final Timer timer = new Timer();
         private HolonomicDriveController controller;
-        private Trajectory trajectory;
+        private PathPlannerTrajectory trajectory;
         /*
          * private Command autonomousCommand; private final RamseteController
          * ramseteController = new RamseteController(); private Timer timer;
@@ -56,7 +50,6 @@ public class Robot extends TimedRobot {
         private CANSparkMax frontRightDrive = new CANSparkMax(RobotMap.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
                         CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        TrajectoryConfig config;
 
         public static OI getOi() {
                 return oi;
@@ -75,14 +68,20 @@ public class Robot extends TimedRobot {
                 frontRightAngle.setSmartCurrentLimit(25);
                 frontRightDrive.setSmartCurrentLimit(25);
                 drivetrain.resetGyroscope();
-                ProfiledPIDController thetaController = new ProfiledPIDController(0, 0, 0,
-                                new TrapezoidProfile.Constraints(5, 3.14));
-                config = new TrajectoryConfig(3, 4).setKinematics(drivetrain.kinematics);
+               /* SwerveDriveKinematicsConstraint constraint = new SwerveDriveKinematicsConstraint(drivetrain.kinematics, 6);
+                CentripetalAccelerationConstraint constraint2 = new CentripetalAccelerationConstraint(5);
+                config = new TrajectoryConfig(6, 6).setKinematics(drivetrain.kinematics);
+                config.addConstraint(constraint);
+                config.addConstraint(constraint2);
                 trajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-                                List.of(new Translation2d(0.5, 0), new Translation2d(0.5, -0.4)),
-                                new Pose2d(0.55, -0.5, Rotation2d.fromDegrees(0)), config);
+                                List.of(new Translation2d(0.4, 0), new Translation2d(0.5, -0.4)),
+                                new Pose2d(0.55, -0.4, Rotation2d.fromDegrees(0)), config);
+                */
+                trajectory = PathPlanner.loadPath("Test Path", 3, 3);
+                ProfiledPIDController thetaController = new ProfiledPIDController(0, 0, 0,
+                                new TrapezoidProfile.Constraints(Math.PI, Math.PI));
                 thetaController.enableContinuousInput(-Math.PI, Math.PI);
-                controller = new HolonomicDriveController(new PIDController(0.5, 0, 0), new PIDController(0.5, 0, 0),
+                controller = new HolonomicDriveController(new PIDController(1, 1, 1), new PIDController(1, 1, 1),
                                 thetaController);
         }
 

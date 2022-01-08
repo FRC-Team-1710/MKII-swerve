@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.frcteam2910.common.drivers.Gyroscope;
 import org.frcteam2910.common.drivers.SwerveModule;
@@ -27,10 +27,10 @@ public class DrivetrainSubsystem extends Subsystem {
     private static final double TRACKWIDTH = 23;
     private static final double WHEELBASE = 23;
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(128);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(247);
-    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(236);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(24);
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(127);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(245);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(240);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(25);
 
     private static DrivetrainSubsystem instance;
         /** Front left swerve module object */
@@ -162,7 +162,7 @@ public class DrivetrainSubsystem extends Subsystem {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, 0.5);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, 1);
         pose = odometry.update(new Rotation2d(gyroscope.getAngle().toRadians()), desiredStates);
         frontLeftModule.setTargetVelocity(desiredStates[0].speedMetersPerSecond, desiredStates[0].angle.getRadians());
         frontRightModule.setTargetVelocity(desiredStates[1].speedMetersPerSecond, desiredStates[1].angle.getRadians());
