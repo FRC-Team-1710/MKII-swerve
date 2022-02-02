@@ -110,7 +110,7 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     testImplementation 'junit:junit:4.12'
-    implementation "com.github.FRCTeam2910.Common:robot:6456e9c82e"
+    implementation "com.github.FRCTeam2910.Common:robot:07bf12b94c"
 }
 
 // Simulation configuration (e.g. environment variables).
