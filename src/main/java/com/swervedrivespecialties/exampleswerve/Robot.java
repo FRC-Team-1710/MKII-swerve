@@ -11,6 +11,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.NetworkTableEntry;
+
 import com.pathplanner.lib.*;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
@@ -24,6 +26,8 @@ public class Robot extends TimedRobot {
 	private final Timer timer = new Timer();
 	private HolonomicDriveController controller;
 	private PathPlannerTrajectory trajectory;
+	private NetworkTableEntry holoRot;
+	private NetworkTableEntry chassisRot;
 	/*
 	 * private Command autonomousCommand; private final RamseteController
 	 * ramseteController = new RamseteController(); private Timer timer;
@@ -39,7 +43,8 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		oi = new OI();
 		drivetrain = DrivetrainSubsystem.getInstance();
-		 
+		holoRot = drivetrain.tab.add("Holonomic Rotation", "test").getEntry();
+		chassisRot = drivetrain.tab.add("Chassis Rotation", 0).getEntry();
 		drivetrain.resetGyroscope();
 		drivetrain.setAmpLimit();
 		/*
@@ -55,12 +60,13 @@ public class Robot extends TimedRobot {
 		 * List.of(new Translation2d(0.4, 0), new Translation2d(0.5, -0.4)),
 		 * new Pose2d(0.55, -0.4, Rotation2d.fromDegrees(0)), config);
 		 */
-		trajectory = PathPlanner.loadPath("Test Path", 0.5, 1);
-		ProfiledPIDController thetaController = new ProfiledPIDController(0, 0, 0,
+		trajectory = PathPlanner.loadPath("Test 2", 0.4, .75);
+		ProfiledPIDController thetaController = new ProfiledPIDController(1, 0.5, 0.1,
 				new TrapezoidProfile.Constraints(Math.PI, Math.PI));
 		thetaController.enableContinuousInput(-Math.PI, Math.PI);
-		PIDController pid = new PIDController(0, 0, 0);
-		controller = new HolonomicDriveController(pid, pid, thetaController);
+		PIDController pid1 = new PIDController(0, 0, 0);
+		PIDController pid2 = new PIDController(0, 0, 0);
+		controller = new HolonomicDriveController(pid1, pid2, thetaController);
 	}
 
 	@Override
@@ -76,6 +82,7 @@ public class Robot extends TimedRobot {
 		 * 
 		 * timer = new Timer(); timer.start();
 		 */
+		drivetrain.resetGyroscope();
 		timer.reset();
 		timer.start();
 	}
@@ -97,12 +104,15 @@ public class Robot extends TimedRobot {
 		 */
 		if (timer.get() <= trajectory.getTotalTimeSeconds()) {
 			PathPlannerState desiredState = (PathPlannerState) trajectory.sample(timer.get());
-
+			
 			ChassisSpeeds targetChassisSpeeds = controller.calculate(drivetrain.getPose(), desiredState,
 					desiredState.holonomicRotation);
+					
 			SwerveModuleState[] targetModuleStates = drivetrain.kinematics
 					.toSwerveModuleStates(targetChassisSpeeds);
 			drivetrain.setModuleStates(targetModuleStates);
+			holoRot.setString(desiredState.holonomicRotation.toString());
+			chassisRot.setDouble(targetChassisSpeeds.omegaRadiansPerSecond);
 		}
 	}
 }

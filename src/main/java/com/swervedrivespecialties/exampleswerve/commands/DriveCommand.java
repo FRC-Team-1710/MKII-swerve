@@ -3,6 +3,7 @@ package com.swervedrivespecialties.exampleswerve.commands;
 import com.swervedrivespecialties.exampleswerve.Robot;
 import com.swervedrivespecialties.exampleswerve.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Translation2d;
 import org.frcteam2910.common.robot.Utilities;
 
@@ -49,7 +50,9 @@ public class DriveCommand extends Command {
         } else if (Math.abs(strafe-prevStrafe) > 0.02){
             prevStrafe = strafe;
         }
-
+        SmartDashboard.putNumber("Forward", forward);
+        SmartDashboard.putNumber("Strafe", strafe);
+        SmartDashboard.putNumber("Rot", rotation);
         // Send values to drive method in DrivetrainSubsystem
         DrivetrainSubsystem.getInstance().drive(new Translation2d(forward, strafe), rotation, true);
     }

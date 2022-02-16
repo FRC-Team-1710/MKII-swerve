@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.frcteam2910.common.drivers.Gyroscope;
 import org.frcteam2910.common.drivers.SwerveModule;
@@ -28,10 +31,10 @@ public class DrivetrainSubsystem extends Subsystem {
     private static final double TRACKWIDTH = Units.inchesToMeters(23);
     private static final double WHEELBASE = Units.inchesToMeters(23);
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(129);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(250);
-    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(237);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(25);
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians(127);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(248);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(232);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(26);
 
     private static DrivetrainSubsystem instance;
 
@@ -100,6 +103,12 @@ public class DrivetrainSubsystem extends Subsystem {
     private final Gyroscope gyroscope = new NavX(SPI.Port.kMXP);
     private final SwerveDriveOdometry odometry;
     private Pose2d pose;
+    public ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
+    private NetworkTableEntry backLeft;
+    private NetworkTableEntry backRight;
+    private NetworkTableEntry frontLeft;
+    private NetworkTableEntry frontRight;
+    private NetworkTableEntry gyroRot;
 
     public DrivetrainSubsystem() {
         gyroscope.calibrate();
@@ -109,6 +118,12 @@ public class DrivetrainSubsystem extends Subsystem {
         frontRightModule.setName("Front Right");
         backLeftModule.setName("Back Left");
         backRightModule.setName("Back Right");
+
+        frontRight = tab.add("Front Right Angle", 0).getEntry();
+        frontLeft = tab.add("Front Left Angle", 0).getEntry();
+        backRight = tab.add("Back Right Angle", 0).getEntry();
+        backLeft = tab.add("Back Left Angle", 0).getEntry();
+        gyroRot = tab.add("Gyro Angle", 0).getEntry();
     }
     /** @return An instance of the DrivetrainSubsystem class */
     public static DrivetrainSubsystem getInstance() {
@@ -126,12 +141,12 @@ public class DrivetrainSubsystem extends Subsystem {
         backLeftModule.updateSensors();
         backRightModule.updateSensors();
         //Outputs encoder values to Shuffleboard
-        SmartDashboard.putNumber("Front Left Module Angle", Math.toDegrees(frontLeftModule.getCurrentAngle()));
-        SmartDashboard.putNumber("Front Right Module Angle", Math.toDegrees(frontRightModule.getCurrentAngle()));
-        SmartDashboard.putNumber("Back Left Module Angle", Math.toDegrees(backLeftModule.getCurrentAngle()));
-        SmartDashboard.putNumber("Back Right Module Angle", Math.toDegrees(backRightModule.getCurrentAngle()));
+        frontRight.setDouble(Math.toDegrees(frontRightModule.getCurrentAngle()));
+        frontLeft.setDouble(Math.toDegrees(frontLeftModule.getCurrentAngle()));
+        backRight.setDouble(Math.toDegrees(backRightModule.getCurrentAngle()));
+        backLeft.setDouble(Math.toDegrees(backLeftModule.getCurrentAngle()));
 
-        SmartDashboard.putNumber("Gyroscope Angle", gyroscope.getAngle().toDegrees());
+        gyroRot.setDouble(gyroscope.getAngle().toDegrees());
 
         frontLeftModule.updateState(TimedRobot.kDefaultPeriod);
         frontRightModule.updateState(TimedRobot.kDefaultPeriod);
@@ -168,7 +183,7 @@ public class DrivetrainSubsystem extends Subsystem {
         }
         
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        pose = odometry.update(new Rotation2d(gyroscope.getAngle().toRadians()), states);
+        pose = odometry.update(Rotation2d.fromDegrees(gyroscope.getAngle().toDegrees()), states);
         
         frontLeftModule.setTargetVelocity(states[0].speedMetersPerSecond, states[0].angle.getRadians());
         frontRightModule.setTargetVelocity(states[1].speedMetersPerSecond, states[1].angle.getRadians());
@@ -182,7 +197,7 @@ public class DrivetrainSubsystem extends Subsystem {
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        //SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, 0.5);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, 0.5);
         pose = odometry.update(new Rotation2d(gyroscope.getAngle().toRadians()), desiredStates);
         frontLeftModule.setTargetVelocity(desiredStates[0].speedMetersPerSecond, desiredStates[0].angle.getRadians());
         frontRightModule.setTargetVelocity(desiredStates[1].speedMetersPerSecond, desiredStates[1].angle.getRadians());
@@ -195,7 +210,7 @@ public class DrivetrainSubsystem extends Subsystem {
 
     public void resetGyroscope() {
         gyroscope.setAdjustmentAngle(gyroscope.getUnadjustedAngle());
-        pose = new Pose2d(new Translation2d(0,0), new Rotation2d(0));
+        pose = new Pose2d(new Translation2d(3,6), new Rotation2d(0));
         odometry.resetPosition(pose, new Rotation2d(gyroscope.getAngle().toRadians()));
     }
 
