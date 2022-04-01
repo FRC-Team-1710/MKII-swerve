@@ -2,7 +2,7 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2022.1.1"
+    id "edu.wpi.first.GradleRIO" version "2022.3.1"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -16,7 +16,6 @@ repositories {
     // CTRE maven repository for Phoenix library (Talon SRX drivers, Victor SPX, etc.)
     maven {
         url = 'https://maven.ctr-electronics.com/release/com/ctre/phoenix/Phoenix-latest.json'
-        
     }
 
     maven {
